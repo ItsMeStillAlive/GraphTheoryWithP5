@@ -1,5 +1,5 @@
 //main node array
-A = [2];
+A = [2, 6];
 B = [1, 4];
 C = [5];
 D = [2, 5];
@@ -72,7 +72,6 @@ nodeWeights[1][4] = 8
 nodeWeights[2][4] = 7
 nodeWeights[3][4] = 5
 nodeWeights[0][5] = 6
-nodeWeights[4][8] = 10
 //function that helps fill and correct the distance between two nodeSetup
 //this works in one direction only (inputiing earlier nodeSetup will fill later nodeSetup but not the other way around because usually we input earlier nodeSetup first)
 function nodeDistance(distanceArr) {
@@ -85,6 +84,9 @@ function nodeDistance(distanceArr) {
 
 //setup code
 nodeDistance(nodeWeights);
+for(i = 0; i < nodeWeights.length; i++) {
+  bubbleSort1DSkipZero(nodeWeights[i]);
+}
 
 //creates array of zeros as an Adjacency matrix
 ADJACENCY_MATRIX = [];
@@ -220,6 +222,52 @@ Node.prototype.nameDisplay = function() {
 }
 ///stright up stolen function area
 
+function bubbleSort1D(arr) {
+  for(i = 1; i < arr.length; i++) {
+    for(j = 0; j < arr.length - 1; j++) {
+      if(arr[j] > arr[j + 1]) {
+        const temp = arr[j];
+        arr[j] = arr[j + 1]
+        arr[j + 1] = temp;
+      }
+    }
+  }
+}
+
+function bubbleSort2D(arr) {
+  for(i = 0; i < arr.length; i++) {
+    bubbleSort1D(arr[i]);
+  }
+
+}
+
+function bubbleSort1DSkipZero(arr) {
+  for(i = 1; i < arr.length; i++) {
+    for(j = 0; j < arr.length - 1; j++) {
+      h = j;
+      k = j + 1;
+      if(arr[h] == 0) {
+        h += 1;
+      }
+      if(arr[k] == 0) {
+        k += 1;
+      }
+      if(arr[h] != 0 && arr[k] != 0 &&arr[h] > arr[k]) {
+        const temp = arr[h];
+        arr[h] = arr[k];
+        arr[k] = temp;
+      }
+    }
+  }
+}
+
+function bubbleSort2DSkipZero(arr) {
+  for(i = 0; i < arr.length; i++) {
+    bubbleSort1DSkipZero(arr[i]);
+  }
+
+}
+
 //debug area
 console.log("noNodes : ", noNodes);
 console.log("noConn : ", noConn);
@@ -230,3 +278,19 @@ console.log("nodeSetup : ", nodeSetup)
 console.log("complete_nodes : ", complete_nodes)
 console.log("ADJACENCY_MATRIX : ", ADJACENCY_MATRIX)
 console.log("nodeWeights : ", nodeWeights)
+
+bubbleTest2D = [[1, 8, 10, 2, 3, 1, 7, 7, 5, 3, 4]];
+let bubbleTest1D = [1, 8, 10, 2, 3, 1, 7, 7, 5, 3, 4];
+let bubbleWithZero = [1, 0, 0, 5, 0, 10, 4];
+
+console.log(bubbleTest1D);
+bubbleSort1D(bubbleTest1D);
+console.log(bubbleTest1D);
+
+console.log(bubbleTest2D);
+bubbleSort2D(bubbleTest2D);
+console.log(bubbleTest2D);
+
+console.log(bubbleWithZero);
+bubbleSort1DSkipZero(bubbleWithZero);
+console.log(bubbleWithZero);
