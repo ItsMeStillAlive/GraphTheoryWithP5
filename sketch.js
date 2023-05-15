@@ -1,18 +1,13 @@
 //main node array
-A = [2, 6];
-B = [1, 4];
-C = [5];
-D = [2, 5];
-E = [1];
-F = [1];
-G = [2];
-H = [4];
-I = [5];
-J = [8];
-K = [3]; 
-L = [2];
-M = [7];
-nodeSetup = [A, B, C, D, E, G, H, I];
+A = [2]; //1
+B = [3, 6]; //2
+C = [4]; //3
+D = [5]; //4
+E = [0]; //5
+F = [7]; //6
+G = [8]; //7
+H = []; //8
+nodeSetup = [A, B, C, D, E, F, G, H];
 nodeCount = nodeSetup.length;
 
 //fills each node until their sizes are equal to nodeCount
@@ -65,29 +60,35 @@ A to B has a distance equal to B to A
 //distance between each nodeSetup
 nodeWeights = [];
 fillZero(nodeWeights, nodeCount);
-nodeWeights[0][1] = 5
-nodeWeights[0][4] = 10
-nodeWeights[1][3] = 7
-nodeWeights[1][4] = 8
-nodeWeights[2][4] = 7
-nodeWeights[3][4] = 5
-nodeWeights[0][5] = 6
+nodeWeights[0][1] = 10
+
+nodeWeights[1][2] = 5
+
+nodeWeights[2][3] = 3
+nodeWeights[3][4] = 2
+
+nodeWeights[1][5] = 9
+nodeWeights[5][6] = 1
+//*/
 //function that helps fill and correct the distance between two nodeSetup
 //this works in one direction only (inputiing earlier nodeSetup will fill later nodeSetup but not the other way around because usually we input earlier nodeSetup first)
-function nodeDistance(distanceArr) {
-  for(i = 0; i < distanceArr.length; i++) {
-    for(j = 0; j < distanceArr.length; j++) {
-      nodeWeights[j][i] = nodeWeights[i][j];
+function nodeFlip(arr) {
+  for(i = 0; i < arr.length; i++) {
+    for(j = 0; j < arr.length; j++) {
+      arr[j][i] = arr[i][j];
     }
   }
+  return arr;
 }
 
+nodeFlip(nodeWeights);
+
+//success!
+//loops 3 times (the amount of all rows)
+diagonalBubbleSort(nodeWeights);
+
+nodeFlip(nodeWeights);
 //setup code
-nodeDistance(nodeWeights);
-for(i = 0; i < nodeWeights.length; i++) {
-  bubbleSort1DSkipZero(nodeWeights[i]);
-}
-
 //creates array of zeros as an Adjacency matrix
 ADJACENCY_MATRIX = [];
 fillZero(ADJACENCY_MATRIX, nodeCount);
@@ -101,7 +102,7 @@ let noConn = 0;
 let nodes = []; //array that stores each node info : position and node size
 let nodeCon = []; // array that each sub array store 2 connected nodes and line length
 let startDisMultiplier = 0.3;
-let forceConstant = 5000;
+let forceConstant = 3000;
 let gravityConstant = 0;
 
 //calculating number of connection
@@ -111,6 +112,22 @@ for(i = 0; i < noNodes; i++) {
       noConn += 1;
     }
   } 
+}
+
+function diagonalBubbleSort(arr) {
+  for (n = 0; n < nodeCount - 2; n++) {
+    for (i = 0; i < nodeCount - 1; i++) {
+      k = 1;
+      for (j = i + n; j < nodeCount - 1; j++) {
+        if (arr[i][j] != 0 && arr[i + k][j + k] != 0 && arr[i][j] > arr[i + k][j + k]) {
+          const temp = arr[i + k][j + k];
+          arr[i + k][j + k] = arr[i][j];
+          arr[i][j] = temp;
+        } else { k += 1}
+      }
+    }
+  }
+  return arr;
 }
 
 function setup() {
@@ -131,9 +148,9 @@ function setup() {
     nodes.push(node);
   }
 
-  //*/FIXED
+  //there's a logic bug here
   for(let i = 0; i < noConn; i++) {
-    for(let j = i + 1; j < noConn; j++) {
+    for(let j = 1; j < noConn + 1; j++) {
       if(ADJACENCY_MATRIX[i][j] == 1 && ADJACENCY_MATRIX[i][j] == ADJACENCY_MATRIX[j][i]) {
         nodeCon.push([complete_nodes[i][j] - 1, complete_nodes[j][i] - 1, nodeWeights[i][j] * weightDistance]);
       }
@@ -142,7 +159,6 @@ function setup() {
 }
 
 function draw() {
-  //noSmooth();
   translate(width / 2, height / 2);
   background(231, 231, 231);
 
@@ -220,53 +236,6 @@ Node.prototype.nameDisplay = function() {
   textPosY = this.pos.y + (font_size / 3)
   text(`${this.name}`, textPosX, textPosY)
 }
-///stright up stolen function area
-
-function bubbleSort1D(arr) {
-  for(i = 1; i < arr.length; i++) {
-    for(j = 0; j < arr.length - 1; j++) {
-      if(arr[j] > arr[j + 1]) {
-        const temp = arr[j];
-        arr[j] = arr[j + 1]
-        arr[j + 1] = temp;
-      }
-    }
-  }
-}
-
-function bubbleSort2D(arr) {
-  for(i = 0; i < arr.length; i++) {
-    bubbleSort1D(arr[i]);
-  }
-
-}
-
-function bubbleSort1DSkipZero(arr) {
-  for(i = 1; i < arr.length; i++) {
-    for(j = 0; j < arr.length - 1; j++) {
-      h = j;
-      k = j + 1;
-      if(arr[h] == 0) {
-        h += 1;
-      }
-      if(arr[k] == 0) {
-        k += 1;
-      }
-      if(arr[h] != 0 && arr[k] != 0 &&arr[h] > arr[k]) {
-        const temp = arr[h];
-        arr[h] = arr[k];
-        arr[k] = temp;
-      }
-    }
-  }
-}
-
-function bubbleSort2DSkipZero(arr) {
-  for(i = 0; i < arr.length; i++) {
-    bubbleSort1DSkipZero(arr[i]);
-  }
-
-}
 
 //debug area
 console.log("noNodes : ", noNodes);
@@ -278,19 +247,3 @@ console.log("nodeSetup : ", nodeSetup)
 console.log("complete_nodes : ", complete_nodes)
 console.log("ADJACENCY_MATRIX : ", ADJACENCY_MATRIX)
 console.log("nodeWeights : ", nodeWeights)
-
-bubbleTest2D = [[1, 8, 10, 2, 3, 1, 7, 7, 5, 3, 4]];
-let bubbleTest1D = [1, 8, 10, 2, 3, 1, 7, 7, 5, 3, 4];
-let bubbleWithZero = [1, 0, 0, 5, 0, 10, 4];
-
-console.log(bubbleTest1D);
-bubbleSort1D(bubbleTest1D);
-console.log(bubbleTest1D);
-
-console.log(bubbleTest2D);
-bubbleSort2D(bubbleTest2D);
-console.log(bubbleTest2D);
-
-console.log(bubbleWithZero);
-bubbleSort1DSkipZero(bubbleWithZero);
-console.log(bubbleWithZero);
