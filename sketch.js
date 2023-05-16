@@ -7,8 +7,16 @@ E = [0]; //5
 F = [7]; //6
 G = [8]; //7
 H = []; //8
-nodeSetup = [A, B, C, D, E, F, G, H];
-nodeCount = nodeSetup.length;
+let nodeSetup = [A, B, C, D, E, F, G, H];
+let nodeCount = nodeSetup.length;
+
+let complete_nodes = [];
+let nodeWeights = [];
+let ADJACENCY_MATRIX = [];
+
+fillZero(complete_nodes, nodeCount);
+fillZero(nodeWeights, nodeCount);
+fillZero(ADJACENCY_MATRIX, nodeCount);
 
 //fills each node until their sizes are equal to nodeCount
 for(i = 0; i < nodeCount; i++) {
@@ -17,22 +25,9 @@ for(i = 0; i < nodeCount; i++) {
   }
 };
 
-function fillZero(arr, len) {
-  for(i = 0; i < len; i++) {
-    arr[i] = [];
-    while(arr[i].length < len) {
-      arr[i].push(0);
-    }
-  };
-  return arr
-}
-
-//complete adjacency matrix
-complete_nodes = [];
-fillZero(complete_nodes, nodeCount);
-
-for(i = 0; i < nodeSetup.length; i++) {
-  for(j = 0; j < nodeSetup.length; j++) {
+//adjacency list
+for(i = 0; i < nodeCount; i++) {
+  for(j = 0; j < nodeCount; j++) {
     k = nodeSetup[i][j]
     if(k != 0) {
       complete_nodes[i][k - 1] = k
@@ -40,62 +35,25 @@ for(i = 0; i < nodeSetup.length; i++) {
     }
   }
 }
-
-function createAdjacencyMatrix(nodeArr) {
-  for(i = 0; i < nodeArr.length; i++) {
-    for(j = 0; j < nodeArr.length; j++) {
-      k = nodeArr[j][i];
-      if(nodeArr[i][j] != 0 && nodeArr[i][j] ==  k + j - i) {
-        ADJACENCY_MATRIX[i][j] = 1;
-        ADJACENCY_MATRIX[j][i] = 1;
-      }
-    }
-  }
-}
-
 /*
 node to node distance
 A to B has a distance equal to B to A
 */
 //distance between each nodeSetup
-nodeWeights = [];
-fillZero(nodeWeights, nodeCount);
-nodeWeights[0][1] = 10
+nodeWeights[0][1] = 1
 
-nodeWeights[1][2] = 5
+nodeWeights[1][2] = 8
+nodeWeights[2][3] = 2
+nodeWeights[3][4] = 3
 
-nodeWeights[2][3] = 3
-nodeWeights[3][4] = 2
-
-nodeWeights[1][5] = 9
-nodeWeights[5][6] = 1
-//*/
-//function that helps fill and correct the distance between two nodeSetup
-//this works in one direction only (inputiing earlier nodeSetup will fill later nodeSetup but not the other way around because usually we input earlier nodeSetup first)
-function nodeFlip(arr) {
-  for(i = 0; i < arr.length; i++) {
-    for(j = 0; j < arr.length; j++) {
-      arr[j][i] = arr[i][j];
-    }
-  }
-  return arr;
-}
+nodeWeights[1][5] = 5
+nodeWeights[5][6] = 10
+nodeWeights[6][7] = 12
 
 nodeFlip(nodeWeights);
-
-//success!
-//loops 3 times (the amount of all rows)
 diagonalBubbleSort(nodeWeights);
-
 nodeFlip(nodeWeights);
-//setup code
-//creates array of zeros as an Adjacency matrix
-ADJACENCY_MATRIX = [];
-fillZero(ADJACENCY_MATRIX, nodeCount);
-
-//complete missing node in nodeSetup array
 createAdjacencyMatrix(complete_nodes);
-
 let noNodes = nodeSetup.length;
 let noConn = 0;
 
@@ -112,22 +70,6 @@ for(i = 0; i < noNodes; i++) {
       noConn += 1;
     }
   } 
-}
-
-function diagonalBubbleSort(arr) {
-  for (n = 0; n < nodeCount - 2; n++) {
-    for (i = 0; i < nodeCount - 1; i++) {
-      k = 1;
-      for (j = i + n; j < nodeCount - 1; j++) {
-        if (arr[i][j] != 0 && arr[i + k][j + k] != 0 && arr[i][j] > arr[i + k][j + k]) {
-          const temp = arr[i + k][j + k];
-          arr[i + k][j + k] = arr[i][j];
-          arr[i][j] = temp;
-        } else { k += 1}
-      }
-    }
-  }
-  return arr;
 }
 
 function setup() {
@@ -148,7 +90,6 @@ function setup() {
     nodes.push(node);
   }
 
-  //there's a logic bug here
   for(let i = 0; i < noConn; i++) {
     for(let j = 1; j < noConn + 1; j++) {
       if(ADJACENCY_MATRIX[i][j] == 1 && ADJACENCY_MATRIX[i][j] == ADJACENCY_MATRIX[j][i]) {
@@ -237,6 +178,54 @@ Node.prototype.nameDisplay = function() {
   text(`${this.name}`, textPosX, textPosY)
 }
 
+function fillZero(arr, len) {
+  for(i = 0; i < len; i++) {
+    arr[i] = [];
+    while(arr[i].length < len) {
+      arr[i].push(0);
+    }
+  };
+  return arr
+}
+
+function createAdjacencyMatrix(nodeArr) {
+  for(i = 0; i < nodeArr.length; i++) {
+    for(j = 0; j < nodeArr.length; j++) {
+      k = nodeArr[j][i];
+      if(nodeArr[i][j] != 0 && nodeArr[i][j] ==  k + j - i) {
+        ADJACENCY_MATRIX[i][j] = 1;
+        ADJACENCY_MATRIX[j][i] = 1;
+      }
+    }
+  }
+}
+
+function nodeFlip(arr) {
+  for(i = 0; i < arr.length; i++) {
+    for(j = 0; j < arr.length; j++) {
+      arr[j][i] = arr[i][j];
+    }
+  }
+  return arr;
+}
+
+function diagonalBubbleSort(arr) {
+  for (n = 0; n < nodeCount - 2; n++) {
+    for (i = 0; i < nodeCount - 1; i++) {
+      k = 1;
+      for (j = i + n; j < nodeCount - 1; j++) {
+        if (arr[i][j] != 0 && arr[i + k][j + k] != 0 && arr[i][j] > arr[i + k][j + k]) {
+          const temp = arr[i + k][j + k];
+          arr[i + k][j + k] = arr[i][j];
+          arr[i][j] = temp;
+        } else { k += 1}
+      }
+    }
+  }
+  return arr;
+}
+
+/*/
 //debug area
 console.log("noNodes : ", noNodes);
 console.log("noConn : ", noConn);
@@ -247,3 +236,4 @@ console.log("nodeSetup : ", nodeSetup)
 console.log("complete_nodes : ", complete_nodes)
 console.log("ADJACENCY_MATRIX : ", ADJACENCY_MATRIX)
 console.log("nodeWeights : ", nodeWeights)
+/*/
